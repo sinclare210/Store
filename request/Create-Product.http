@@ -2,7 +2,7 @@ POST http://localhost:8080/product
 Content-Type: application/json
 
 {
-    "Name":"Sinclair",
+    "Name":"Sinclair adebayo",
     "Description":"Used to clear people",
     "Price": 3.2000,
     "User_Id": 12

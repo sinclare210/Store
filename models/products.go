@@ -2,7 +2,6 @@ package models
 
 import (
 	"errors"
-
 	"github.com/sinclare210/Store.git/db"
 )
 
@@ -29,8 +28,48 @@ func (product Product)CreateProduct()error{
 	if err != nil{
 		return errors.New("wrong Execution")
 	}
-
-	
 	return nil
 }
+
+func GetProducts()([]Product,error){
+	query := `
+	SELECT * FROM products
+	`
+
+	rows,err := db.DB.Query(query)
+	if err != nil{
+		return nil,errors.New("bad request")
+	}
+
+	var products []Product
+
+	for rows.Next(){
+		var product Product
+		err := rows.Scan(&product.Id,&product.Name,&product.Description,&product.Price,&product.User_Id)
+		if err != nil{
+			return nil,err
+		}
+		products = append(products, product)
+	}
+	return products,nil
+
+}
+
+func GetProduct(id int64) (Product,error){
+	query := `
+	SELECT * FROM products WHERE Id = ?
+	`
+	rows := db.DB.QueryRow(query,id)
+
+	var product Product
+
+	err := rows.Scan(&product.Id,&product.Name,&product.Description,&product.Price,&product.User_Id)
+	if err != nil{
+		return product,err
+	}
+
+	return product,nil
+	
+}
+
 
