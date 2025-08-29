@@ -84,13 +84,51 @@ func (product Product)DeleteProduct() error{
 	}
 	defer stmt.Close()
 
-	_,err = stmt.Exec(product.Id)
+	result,err := stmt.Exec(product.Id)
 	if err != nil{
 		return errors.New("bad request")
 	}
-	return nil
 
+	rowAffected,err :=  result.RowsAffected()
+	if err != nil{
+		return errors.New("could not check rows affected")
+	}
+
+	if rowAffected == 0 {
+		return errors.New("product not found or already deleted")
+	}
+
+	return nil
+}
+
+func (product Product)UpdateProduct()error{
+	query := `
+	UPDATE products 
+	SET Name = ?, Description = ?, Price = ?, User_Id = ?
+	WHERE Id = ?
+	`
+
+	stmt,err := db.DB.Prepare(query)
+	if err != nil{
+		return errors.New("bad request")
+	}
+	defer stmt.Close()
+
+	result,err := stmt.Exec(product.Name,product.Description,product.Price,product.User_Id,product.Id)
+	if err != nil{
+		return errors.New("bad request")
+	}
 	
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		return errors.New("could not check rows affected")
+	}
+
+	if rowsAffected == 0 {
+		return errors.New("product not found or already deleted")
+	}
+
+	return nil
 }
 
 

@@ -12,13 +12,13 @@ import (
 func getProduct(context *gin.Context) {
 	id,err := strconv.ParseInt(context.Param("id"),10,64)
 	if err != nil{
-		context.JSON(http.StatusBadRequest,gin.H{"message":"Invalid request"})
+		context.JSON(http.StatusBadRequest,gin.H{"message":"400 Bad Request"})
 		return
 	}
 
 	product,err := models.GetProduct(id)
 	if err != nil{
-		context.JSON(http.StatusInternalServerError,gin.H{"message":"Database error"})
+		context.JSON(http.StatusInternalServerError,gin.H{"message":"500 Internal Server Error"})
 		return
 	}
 	context.JSON(http.StatusOK, gin.H{"message": "product", "products": product})
@@ -27,7 +27,7 @@ func getProduct(context *gin.Context) {
 func getProducts(context *gin.Context) {
 	products, err := models.GetProducts()
 	if err != nil {
-		context.JSON(http.StatusInternalServerError, gin.H{"message": "Server error"})
+		context.JSON(http.StatusInternalServerError, gin.H{"message": "500 Internal Server Error"})
 		return
 	}
 
@@ -35,13 +35,34 @@ func getProducts(context *gin.Context) {
 }
 
 func updateProduct(context *gin.Context) {
+	id,err := strconv.ParseInt(context.Param("id"),10,64)
+	if err != nil{
+		context.JSON(http.StatusBadRequest,gin.H{"message":"400 Bad Request"})
+		return
+	}
+
+	var product models.Product
+	product.Id = id
+
+	err = context.ShouldBindJSON(&product)
+	if err != nil {
+		context.JSON(http.StatusBadRequest, gin.H{"message": "400 Bad Request"})
+		return
+	}
+
+	err = product.UpdateProduct()
+	  if err != nil {
+        context.JSON(http.StatusNotFound, gin.H{"message": err.Error()})
+        return
+    }
+	context.JSON(http.StatusOK, gin.H{"message": "product updated", "products": product})
 
 }
 
 func deleteProduct(context *gin.Context) {
 	id,err := strconv.ParseInt(context.Param("id"),10,64)
 	if err != nil{
-		context.JSON(http.StatusBadRequest,gin.H{"message":"Invalid request"})
+		context.JSON(http.StatusBadRequest,gin.H{"message":"400 Bad Request"})
 		return
 	}
 
@@ -49,7 +70,7 @@ func deleteProduct(context *gin.Context) {
 	product.Id = id
 	err  = product.DeleteProduct()
 	if err != nil{
-		context.JSON(http.StatusInternalServerError,gin.H{"message":"Databese error"})
+		context.JSON(http.StatusInternalServerError,gin.H{"message":err.Error()})
 		return
 	}
 
@@ -63,12 +84,12 @@ func createProduct(context *gin.Context) {
 	var product models.Product
 	err := context.ShouldBindJSON(&product)
 	if err != nil {
-		context.JSON(http.StatusBadRequest, gin.H{"message": "Invalid inputs"})
+		context.JSON(http.StatusBadRequest, gin.H{"message": "400 Bad Request"})
 		return
 	}
 	err = product.CreateProduct()
 	if err != nil {
-		context.JSON(http.StatusInternalServerError, gin.H{"message": "Database error"})
+		context.JSON(http.StatusInternalServerError, gin.H{"message": "500 Internal Server Error"})
 		return
 	}
 
