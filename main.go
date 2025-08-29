@@ -1,8 +1,11 @@
 package main
 
 import (
+	"net/http"
+
 	"github.com/gin-gonic/gin"
 	"github.com/sinclare210/Store.git/db"
+	"github.com/sinclare210/Store.git/models"
 )
 
 func main() {
@@ -35,7 +38,19 @@ func deleteProduct(context *gin.Context) {
 }
 
 func createProduct(context *gin.Context) {
+	var product models.Product
+	err := context.ShouldBindJSON(&product)
+	if err != nil {
+		context.JSON(http.StatusBadRequest, gin.H{"message": "Invalid inputs"})
+		return
+	}
+	err = product.CreateProduct()
+	if err != nil {
+		context.JSON(http.StatusInternalServerError, gin.H{"message": "Database error"})
+		return
+	}
 
+	context.JSON(http.StatusAccepted, gin.H{"message": "Products Created!"})
 }
 
 func login(context *gin.Context) {
