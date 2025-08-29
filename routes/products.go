@@ -39,7 +39,24 @@ func updateProduct(context *gin.Context) {
 }
 
 func deleteProduct(context *gin.Context) {
+	id,err := strconv.ParseInt(context.Param("id"),10,64)
+	if err != nil{
+		context.JSON(http.StatusBadRequest,gin.H{"message":"Invalid request"})
+		return
+	}
 
+	var product models.Product
+	product.Id = id
+	err  = product.DeleteProduct()
+	if err != nil{
+		context.JSON(http.StatusInternalServerError,gin.H{"message":"Databese error"})
+		return
+	}
+
+	   context.JSON(http.StatusOK, gin.H{
+        "message": "Product deleted successfully",
+        "deleted_id": id,
+    })
 }
 
 func createProduct(context *gin.Context) {

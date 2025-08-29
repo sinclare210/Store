@@ -22,6 +22,7 @@ func (product Product)CreateProduct()error{
 	if err != nil{
 		return errors.New("wrong Statement")
 	}
+	defer stmt.Close()
 	_,err = stmt.Exec(&product.Name,&product.Description,&product.Price,&product.User_Id)
 
 
@@ -69,6 +70,26 @@ func GetProduct(id int64) (Product,error){
 	}
 
 	return product,nil
+	
+}
+
+func (product Product)DeleteProduct() error{
+	query := `
+	DELETE FROM products WHERE Id = ?
+	`
+
+	stmt,err := db.DB.Prepare(query)
+	if err != nil{
+		return errors.New("bad request")
+	}
+	defer stmt.Close()
+
+	_,err = stmt.Exec(product.Id)
+	if err != nil{
+		return errors.New("bad request")
+	}
+	return nil
+
 	
 }
 
