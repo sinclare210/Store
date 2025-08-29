@@ -96,10 +96,4 @@ func createProduct(context *gin.Context) {
 	context.JSON(http.StatusAccepted, gin.H{"message": "Products Created!"})
 }
 
-func login(context *gin.Context) {
 
-}
-
-func signUp(context *gin.Context) {
-
-}
