@@ -8,8 +8,20 @@ import (
 )
 
 func login(context *gin.Context) {
-	
+	var user models.User
+	err := context.ShouldBindJSON(&user)
+	if err != nil {
+		context.JSON(http.StatusBadRequest, gin.H{"message": "400 Bad Request"})
+		return
+	}
 
+	err = user.ValidCredentials()
+	if err != nil {
+		context.JSON(http.StatusUnauthorized, gin.H{"message": "Invalid Credentials"})
+		return
+	}
+
+	context.JSON(http.StatusAccepted, gin.H{"message": "Login Successful"})
 }
 
 func signUp(context *gin.Context) {
@@ -39,6 +51,7 @@ func getUsers(context *gin.Context) {
 
 	context.JSON(http.StatusOK, gin.H{"message": "users", "products": users})
 }
+
 
 
 

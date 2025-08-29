@@ -63,3 +63,22 @@ func GetUsers()([]User,error){
 	return users,nil
 }
 
+func (user User)ValidCredentials()error{
+	query := `
+	SELECT Password FROM users WHERE Email = ?
+	`
+
+	rows := db.DB.QueryRow(query,user.Email)
+	var HashedPassword string
+	err := rows.Scan(&HashedPassword)
+	if err != nil{
+			return err
+	}
+
+	err = utils.CheckHashedPassword(HashedPassword,user.Password)
+	if err != nil{
+			return err
+	}
+	return nil
+}
+
