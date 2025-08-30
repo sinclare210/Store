@@ -65,12 +65,12 @@ func GetUsers()([]User,error){
 
 func (user User)ValidCredentials()error{
 	query := `
-	SELECT Password FROM users WHERE Email = ?
+	SELECT Id,Password FROM users WHERE Email = ?
 	`
 
 	rows := db.DB.QueryRow(query,user.Email)
 	var HashedPassword string
-	err := rows.Scan(&HashedPassword)
+	err := rows.Scan(&user.Id,&HashedPassword)
 	if err != nil{
 			return err
 	}

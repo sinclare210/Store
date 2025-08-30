@@ -5,6 +5,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/sinclare210/Store.git/models"
+	"github.com/sinclare210/Store.git/utils"
 )
 
 func login(context *gin.Context) {
@@ -21,7 +22,13 @@ func login(context *gin.Context) {
 		return
 	}
 
-	context.JSON(http.StatusAccepted, gin.H{"message": "Login Successful"})
+	token, err := utils.GenerateToken(user.Email,user.Id)
+	if err != nil {
+		context.JSON(http.StatusBadRequest, gin.H{"message": "400 Bad Request"})
+		return
+	}
+
+	context.JSON(http.StatusAccepted, gin.H{"message": "Login Successful","token":token})
 }
 
 func signUp(context *gin.Context) {
