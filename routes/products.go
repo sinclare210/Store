@@ -81,6 +81,11 @@ func deleteProduct(context *gin.Context) {
 }
 
 func createProduct(context *gin.Context) {
+	token := context.Request.Header.Get("Authorization")
+	if token == ""{
+		context.JSON(http.StatusUnauthorized, gin.H{"message": "Not Authorized"})
+		return
+	}
 	var product models.Product
 	err := context.ShouldBindJSON(&product)
 	if err != nil {
